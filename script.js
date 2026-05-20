@@ -214,46 +214,63 @@ function generarContenidoExplicacion() {
 
     for (let i = 0; i < secuencia.length - 1; i++) {
         conteo[secuencia[i]][secuencia[i+1]]++;
-        salidas[secuencia[i]]++;
+        salidas[secuencia[i]]++; // Cuántas veces salimos de este clima
     }
 
     // 2. Construir el HTML dinámico
     let html = `
     <div class="explainer-step">
         <h3>Fase 1: El Conteo de Saltos</h3>
-        <p>La app revisó tu historial y contó exactamente cuántas veces un clima cambió a otro:</p>
-        <table>
-            <tr><th>Hoy \\ Mañana</th><th>☀️ Sol</th><th>☁️ Nube</th><th>🌧️ Lluvia</th><th>Total Salidas</th></tr>`;
+        <p>La app revisó tu historial y contó cuántas veces el clima cambió de un estado a otro. El <strong>Total Salidas</strong> es la suma de toda la fila.</p>
+        <table style="width:100%; text-align:center; border-collapse: collapse; margin-top: 10px;">
+            <tr style="background:#f1f2f6; color:#2c3e50;">
+                <th style="padding:10px;">Hoy \\ Mañana</th><th>☀️ Sol</th><th>☁️ Nube</th><th>🌧️ Lluvia</th><th>Total Salidas</th>
+            </tr>`;
 
     estados.forEach(f => {
-        html += `<tr><th>${iconos[f]}</th>`;
-        estados.forEach(c => html += `<td>${conteo[f][c]}</td>`);
-        html += `<td style="background:#ecf0f1; font-weight:bold;">${salidas[f]}</td></tr>`;
+        html += `<tr><th style="text-align:left; padding:10px;">${iconos[f]} ${f}</th>`;
+        estados.forEach(c => html += `<td style="padding:10px; border-bottom:1px solid #eee;">${conteo[f][c]}</td>`);
+        html += `<td style="background:#ecf0f1; font-weight:bold; padding:10px;">${salidas[f]}</td></tr>`;
     });
     html += `</table></div>`;
 
     html += `
     <div class="explainer-step" style="border-left-color: #00b894;">
         <h3 style="color: #00b894;">Fase 2: La Matemática (Porcentajes)</h3>
-        <p>Para obtener la probabilidad, la app divide cada número entre el "Total de Salidas" de su fila. Así nos aseguramos de que toda la fila sume 100%.</p>
-        <table>
-            <tr><th>Hoy \\ Mañana</th><th>☀️ Sol</th><th>☁️ Nube</th><th>🌧️ Lluvia</th></tr>`;
+        <p>Para obtener el porcentaje exacto, aplicamos una regla simple: <strong>(Conteo de la celda ÷ Total de Salidas) × 100</strong>.</p>
+        <table style="width:100%; text-align:center; border-collapse: collapse; font-size:0.95rem; margin-top: 10px;">
+            <tr style="background:#f1f2f6; color:#2c3e50;">
+                <th style="padding:10px;">Hoy \\ Mañana</th><th>☀️ Sol</th><th>☁️ Nube</th><th>🌧️ Lluvia</th>
+            </tr>`;
     
     estados.forEach(f => {
-        html += `<tr><th>${iconos[f]}</th>`;
+        html += `<tr><th style="text-align:left; padding:10px;">${iconos[f]} ${f}</th>`;
         estados.forEach(c => {
-            let prob = salidas[f] > 0 ? (conteo[f][c] / salidas[f] * 100).toFixed(0) : 0;
-            html += `<td>${prob}%</td>`;
+            if (salidas[f] > 0) {
+                // AQUÍ ESTÁ EL CAMBIO CLAVE: Mostramos la división
+                let prob = (conteo[f][c] / salidas[f] * 100).toFixed(0);
+                html += `<td style="padding:10px; border-bottom:1px solid #eee;">
+                            <span style="color:#7f8c8d; font-size:0.8rem;">(${conteo[f][c]}/${salidas[f]})</span><br>
+                            <b style="color:#2c3e50; font-size:1.1rem;">${prob}%</b>
+                         </td>`;
+            } else {
+                html += `<td style="padding:10px; border-bottom:1px solid #eee; color:#bdc3c7;">Sin datos</td>`;
+            }
         });
         html += `</tr>`;
     });
 
-    const ultimo = secuencia[secuencia.length-1];
+    const ultimo = secuencia.length > 0 ? secuencia[secuencia.length-1] : "Ninguno";
 
-    html += `</table></div>
-    <div class="explainer-step" style="border-left-color: #f39c12; background: #fffde7;">
-        <h3 style="color: #f39c12;"><i class="fa-solid fa-bolt"></i> Fase 3: La Predicción (Propiedad de Márkov)</h3>
-        <p>Aquí ocurre la magia. Como el último clima que ingresaste fue <strong>${iconos[ultimo]} ${ultimo}</strong>, la aplicación aplica la "amnesia" de Márkov: ignora todo el pasado y <strong>solo usa la fila de ${ultimo}</strong> para calcular cómo estará mañana.</p>
+    html += `</table>
+        <p style="font-size:0.85rem; color:#7f8c8d; margin-top:15px; background:white; padding:10px; border-radius:8px; border: 1px dashed #ccc;">
+            <em>*Nota: Las filas que dicen "Sin datos" no suman 100% porque la app necesita que registres qué pasa después de esos días para poder aprender.</em>
+        </p>
+    </div>
+    
+    <div class="explainer-step" style="border-left-color: #f39c12; background: #fffde7; margin-bottom:0;">
+        <h3 style="color: #f39c12;"><i class="fa-solid fa-bolt"></i> Fase 3: La Predicción</h3>
+        <p>El último clima que ingresaste fue <strong>${iconos[ultimo]} ${ultimo}</strong>. Usando la <em>Propiedad de Márkov</em>, la app ignora todo el pasado y <strong>solo usa la fila de ${ultimo}</strong> de la tabla de arriba para dibujar las barras finales.</p>
     </div>`;
 
     document.getElementById('contenido-explicacion').innerHTML = html;
