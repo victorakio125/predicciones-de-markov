@@ -1,0 +1,155 @@
+:root {
+    --glass-bg: rgba(255, 255, 255, 0.9);
+    --text-main: #2c3e50;
+    --text-muted: #7f8c8d;
+    --primary: #5c6bc0;
+    --primary-hover: #3f51b5;
+    --sunny: #f39c12;
+    --cloudy: #7f8c8d;
+    --rainy: #2980b9;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+body {
+    background: linear-gradient(135deg, #e0eafc, #cfdef3);
+    color: var(--text-main);
+    transition: background 1s ease-in-out;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+body.bg-soleado { background: linear-gradient(135deg, #ffeaa7, #fab1a0); }
+body.bg-nublado { background: linear-gradient(135deg, #dfe6e9, #b2bec3); }
+body.bg-lluvioso { background: linear-gradient(135deg, #74b9ff, #0984e3); }
+
+.app-container {
+    width: 100%;
+    max-width: 600px;
+    background: var(--glass-bg);
+    border-radius: 24px;
+    padding: 40px 30px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+    min-height: 600px;
+}
+
+/* Sistema de Pantallas (Wizard) */
+.screen {
+    display: none;
+    animation: fadeIn 0.4s ease-in-out;
+}
+.screen.active { display: block; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Tipografía y Textos */
+h1, h2 { color: #1a252f; margin-bottom: 10px; }
+.hero-icon { font-size: 4rem; text-align: center; margin-bottom: 20px; }
+.intro-text { font-size: 1.1rem; line-height: 1.6; text-align: center; margin-bottom: 20px; }
+.subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px; line-height: 1.5;}
+.step-header { font-size: 0.85rem; font-weight: bold; color: var(--primary); text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;}
+.help-text { font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-top: 10px; }
+
+/* Botones de navegación */
+.btn-primary, .btn-secondary, .btn-reset {
+    padding: 14px 24px; border: none; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.2s;
+}
+.btn-primary { background: var(--primary); color: white; width: 100%; }
+.btn-primary:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-2px); }
+.btn-primary:disabled { background: #bdc3c7; cursor: not-allowed; }
+.btn-secondary { background: #ecf0f1; color: var(--text-main); }
+.btn-reset { background: #ffeaa7; color: #d35400; width: 100%; margin-top: 10px; }
+.nav-buttons { display: flex; gap: 10px; margin-top: 30px; }
+.nav-buttons .btn-primary { flex: 2; }
+.nav-buttons .btn-secondary { flex: 1; }
+
+.info-box { background: #e8eaf6; padding: 15px; border-radius: 12px; display: flex; gap: 15px; align-items: center; margin-bottom: 30px; font-size: 0.95rem; }
+.info-box i { color: var(--primary); font-size: 1.5rem; }
+
+/* Clima Botones */
+.weather-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+.weather-buttons button { padding: 15px 5px; border: none; border-radius: 16px; font-size: 1rem; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: 0.2s; }
+.btn-sunny { background: #fff8e1; color: var(--sunny); border: 2px solid #ffe082; }
+.btn-cloudy { background: #f5f6fa; color: var(--cloudy); border: 2px solid #dcdde1; }
+.btn-rainy { background: #e3f2fd; color: var(--rainy); border: 2px solid #90caf9; }
+.weather-buttons button:active { transform: scale(0.95); }
+
+/* Historial */
+.history-box { background: rgba(0,0,0,0.03); padding: 15px; border-radius: 16px; }
+.history-box h4 { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px; }
+.icons-strip { font-size: 1.5rem; display: flex; flex-wrap: wrap; gap: 5px; min-height: 35px; }
+
+/* Dígrafo */
+#canvas-digrafo { background: white; border-radius: 16px; height: 350px; cursor: grab; border: 2px dashed #dfe6e9; }
+#svg-grafo { width: 100%; height: 100%; }
+
+/* Barras y Tablas */
+.bar-row { margin-bottom: 15px; }
+.bar-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold; }
+.bar-bg { width: 100%; background: #ecf0f1; height: 14px; border-radius: 10px; overflow: hidden; }
+.bar-fill { height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 10px; }
+
+table { width: 100%; background: white; border-radius: 12px; overflow: hidden; border-collapse: collapse; font-size: 0.9rem; }
+th, td { padding: 12px; text-align: center; border: 1px solid #f1f2f6; }
+th { background: #f8f9fa; }
+.active-row { background: #e8eaf6; font-weight: bold; }
+/* Botón de Matemática */
+.btn-math {
+    background: #e8eaf6;
+    color: var(--primary);
+    border: none;
+    padding: 8px 15px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: 0.2s;
+}
+.btn-math:hover { background: #c5cae9; }
+
+/* Modal Overlay (Fondo oscuro borroso) */
+.modal-overlay {
+    display: none; 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6); 
+    backdrop-filter: blur(5px); 
+    z-index: 3000;
+    justify-content: center; align-items: center; padding: 20px;
+    opacity: 0; transition: opacity 0.3s ease;
+}
+.modal-overlay.active { display: flex; opacity: 1; }
+
+/* Contenido del Modal */
+.modal-content {
+    background: white; 
+    width: 100%; max-width: 650px; max-height: 85vh;
+    border-radius: 20px; padding: 30px; 
+    overflow-y: auto; color: var(--text-main);
+    transform: translateY(20px); transition: transform 0.3s ease;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+}
+.modal-overlay.active .modal-content { transform: translateY(0); }
+
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.btn-close { background: #ff7675; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; transition: 0.2s; }
+.btn-close:hover { background: #d63031; transform: scale(1.1); }
+
+/* Pasos Explicativos */
+.explainer-step { 
+    background: #f8f9fa; 
+    padding: 20px; 
+    border-radius: 12px; 
+    margin-bottom: 20px; 
+    border-left: 5px solid var(--primary); 
+}
+.explainer-step h3 { margin-top: 0; color: var(--primary); font-size: 1.2rem; }
+.explainer-step p { font-size: 0.95rem; margin-bottom: 15px; color: var(--text-muted); }
+.explainer-step table { box-shadow: none; border: 1px solid #dfe6e9; }

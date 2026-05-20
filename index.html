@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clima Predictivo | Markov</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-overlay"></div>
+
+    <div class="app-container">
+        <section id="screen-1" class="screen active">
+            <div class="hero-icon">🌤️ ➡️ 🔮</div>
+            <h1>El Clima tiene "Memoria"</h1>
+            <p class="intro-text">
+                Imagina que el clima de mañana depende <strong>únicamente</strong> del clima de hoy. 
+                A esto los matemáticos le llaman "Cadena de Márkov".
+            </p>
+            <div class="info-box">
+                <i class="fa-solid fa-lightbulb"></i>
+                <p>En esta app, le enseñaremos a la computadora cómo estuvo el clima los últimos días, y ella intentará predecir el futuro.</p>
+            </div>
+            <button class="btn-primary btn-large" onclick="irAPantalla(2)">¡Empezar a enseñarle!</button>
+            <div style="text-align: center; margin-top: 15px;">
+    <button onclick="document.getElementById('math-modal').style.display='block'" style="background: none; border: none; color: var(--primary); text-decoration: underline; cursor: pointer; font-weight: bold;">
+        <i class="fa-solid fa-graduation-cap"></i> ¿Cómo funciona la matemática?
+    </button>
+</div>
+
+<div id="math-modal" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--glass-bg); z-index: 100; border-radius: 24px; padding: 30px; text-align: left; overflow-y: auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="color: var(--primary);"><i class="fa-solid fa-calculator"></i> Cadenas de Márkov</h3>
+        <button onclick="document.getElementById('math-modal').style.display='none'" style="background: #e74c3c; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <p style="font-size: 0.95rem; margin-bottom: 15px;">La app utiliza una <strong>Matriz de Transición</strong>. Cada vez que registras un día, el programa cuenta cuántas veces un clima cambia a otro y calcula una probabilidad.</p>
+    <p style="font-size: 0.95rem; margin-bottom: 15px;">La regla matemática principal (<strong>Propiedad de Márkov</strong>) dice que el futuro depende <em>exclusivamente</em> del presente. La app ignora todo el historial antiguo y solo se fija en el clima de hoy para predecir el de mañana.</p>
+    <div style="background: #f8f9fa; padding: 15px; border-radius: 12px; font-size: 0.9rem; border-left: 4px solid var(--primary);">
+        <em>"Si de 10 veces que estuvo Soleado, 7 veces llovió al día siguiente... la app te dirá que hay un 70% de probabilidad de lluvia mañana."</em>
+    </div>
+</div>
+        </section>
+
+        <section id="screen-2" class="screen">
+            <div class="step-header">Paso 1 de 3</div>
+            <h2>¿Cómo estuvo el clima?</h2>
+            <p class="subtitle">Registra al menos 3 días para que la app empiece a encontrar patrones.</p>
+            
+            <div class="weather-buttons">
+                <button onclick="agregarClima('Soleado')" class="btn-sunny"><i class="fa-solid fa-sun"></i> Soleado</button>
+                <button onclick="agregarClima('Nublado')" class="btn-cloudy"><i class="fa-solid fa-cloud"></i> Nublado</button>
+                <button onclick="agregarClima('Lluvioso')" class="btn-rainy"><i class="fa-solid fa-cloud-showers-heavy"></i> Lluvioso</button>
+            </div>
+            
+            <div class="history-box">
+                <h4>Tu registro:</h4>
+                <div class="icons-strip" id="historial-iconos">
+                    <span class="placeholder">Empieza a presionar los botones arriba...</span>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn-secondary" onclick="irAPantalla(1)">Atrás</button>
+                <button class="btn-primary" id="btn-next-2" onclick="irAPantalla(3)" disabled>Ver Mapa Mental <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <section id="screen-3" class="screen">
+            <div class="step-header">Paso 2 de 3</div>
+            <h2>El Mapa de Aprendizaje 🧠</h2>
+            <p class="subtitle">Así es como la app conecta los días. Los números muestran la probabilidad de pasar de un clima a otro.</p>
+            
+            <div class="card graph-card">
+                <div id="canvas-digrafo">
+                    <svg id="svg-grafo"></svg>
+                </div>
+                <p class="help-text"><i class="fa-solid fa-hand-pointer"></i> Puedes arrastrar y hacer zoom en el mapa.</p>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn-secondary" onclick="irAPantalla(2)">Atrás</button>
+                <button class="btn-primary" onclick="irAPantalla(4)">Ver Predicción <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <section id="screen-4" class="screen">
+            <div class="step-header">Paso 3 de 3</div>
+            <h2>Predicción para mañana 🔮</h2>
+            <p class="subtitle" id="texto-hoy">Basado en que hoy está...</p>
+
+            <div class="card result-card">
+                <div id="prediccion-container"></div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h3>Tabla de Detalles 📊</h3>
+                <button class="btn-math" onclick="abrirModalExplicacion()">
+                    <i class="fa-solid fa-graduation-cap"></i> ¿Cómo lo calculó?
+                </button>
+            </div>
+            <div id="matriz-container" class="table-responsive"></div>
+            <div class="nav-buttons" style="margin-top: 30px;">
+                <button class="btn-secondary" onclick="irAPantalla(2)"><i class="fa-solid fa-plus"></i> Agregar más días</button>
+                <button class="btn-reset" onclick="reiniciarApp()"><i class="fa-solid fa-trash-can"></i> Empezar de cero</button>
+            </div>
+        </section>
+    </div>
+    <div id="modal-matematica" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🧠 El Cerebro de Márkov</h2>
+                <button onclick="cerrarModalExplicacion()" class="btn-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" id="contenido-explicacion">
+                </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
